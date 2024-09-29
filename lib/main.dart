@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 import 'pagina1.dart';
+import 'pagina2.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,26 +34,33 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lista de Leitura'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/reading-list');
-              },
-              child: const Text('Ver Lista de Leitura'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/search-books');
-              },
-              child: const Text('Pesquisar Livros'),
-            ),
-          ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.purple, Colors.deepPurple],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/reading-list');
+                },
+                child: const Text('Ver Lista de Leitura'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/search-books');
+                },
+                child: const Text('Pesquisar Livros'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -84,7 +92,7 @@ class _ReadingListPageState extends State<ReadingListPage> {
 
   Future<void> _removeBook(String id) async {
     await DatabaseHelper().removeBook(id);
-    _loadBooks(); // Recarrega a lista de livros após a remoção
+    _loadBooks();
   }
 
   @override
@@ -109,6 +117,23 @@ class _ReadingListPageState extends State<ReadingListPage> {
                     icon: const Icon(Icons.delete),
                     onPressed: () => _removeBook(book['id']),
                   ),
+                  onTap: () {
+                    // Navegar para a página de detalhes do livro (Pagina2)
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Pagina2(
+                          book: {
+                            'volumeInfo': {
+                              'title': book['title'],
+                              'authors': book['authors']?.split(', '),
+                              'imageLinks': {'thumbnail': book['thumbnail']}
+                            }
+                          },
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),

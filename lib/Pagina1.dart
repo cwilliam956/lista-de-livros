@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'database_helper.dart';
+import 'pagina2.dart';
 
 class Pagina1 extends StatefulWidget {
   @override
@@ -11,13 +12,13 @@ class Pagina1 extends StatefulWidget {
 class _Pagina1State extends State<Pagina1> {
   List books = [];
   TextEditingController _searchController = TextEditingController();
-  bool isLoading = true; 
+  bool isLoading = true;
   String errorMessage = '';
 
   @override
   void initState() {
     super.initState();
-    fetchBooks(); 
+    fetchBooks();
   }
 
   Future<void> fetchBooks([String query = ""]) async {
@@ -26,7 +27,8 @@ class _Pagina1State extends State<Pagina1> {
       errorMessage = '';
     });
 
-    final String url = 'https://www.googleapis.com/books/v1/volumes?q=${query.isEmpty ? 'books' : query}';
+    final String url =
+        'https://www.googleapis.com/books/v1/volumes?q=${query.isEmpty ? 'books' : query}';
     try {
       final response = await http.get(Uri.parse(url));
 
@@ -55,7 +57,8 @@ class _Pagina1State extends State<Pagina1> {
     final bookToSave = {
       'id': book['id'],
       'title': book['volumeInfo']['title'] ?? 'Sem título',
-      'authors': book['volumeInfo']['authors']?.join(', ') ?? 'Autor desconhecido',
+      'authors':
+          book['volumeInfo']['authors']?.join(', ') ?? 'Autor desconhecido',
       'thumbnail': book['volumeInfo']['imageLinks']?['thumbnail']
     };
     await DatabaseHelper().addBook(bookToSave);
@@ -69,12 +72,6 @@ class _Pagina1State extends State<Pagina1> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pesquisar Livros'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -101,7 +98,9 @@ class _Pagina1State extends State<Pagina1> {
             if (isLoading)
               const Center(child: CircularProgressIndicator())
             else if (errorMessage.isNotEmpty)
-              Center(child: Text(errorMessage, style: const TextStyle(color: Colors.red)))
+              Center(
+                  child: Text(errorMessage,
+                      style: const TextStyle(color: Colors.red)))
             else if (books.isEmpty)
               const Center(child: Text('Nenhum livro encontrado.')),
             if (books.isNotEmpty)
@@ -112,16 +111,26 @@ class _Pagina1State extends State<Pagina1> {
                     final book = books[index]['volumeInfo'];
                     return ListTile(
                       title: Text(book['title'] ?? 'Sem título'),
-                      subtitle: Text(book['authors']?.join(', ') ?? 'Autor desconhecido'),
+                      subtitle: Text(
+                          book['authors']?.join(', ') ?? 'Autor desconhecido'),
                       leading: book['imageLinks'] != null
-                          ? Image.network(book['imageLinks']['thumbnail'], fit: BoxFit.cover, width: 50, height: 50)
-                          : const Icon(Icons.book),
+                          ? Image.network(book['imageLinks']['thumbnail'],
+                              fit: BoxFit.cover, width: 50)
+                          : const Icon(Icons.book, size: 50),
                       trailing: IconButton(
-                        icon: const Icon(Icons.add),
+                        icon: const Icon(Icons.add, color: Colors.green),
                         onPressed: () {
                           _addBookToReadingList(books[index]);
                         },
                       ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Pagina2(book: books[index]),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -130,11 +139,5 @@ class _Pagina1State extends State<Pagina1> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
   }
 }

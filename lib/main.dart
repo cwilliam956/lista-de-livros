@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const Home(),
         '/reading-list': (context) => const ReadingListPage(),
-        '/search-books': (context) => Pagina1(),
+        '/search-books': (context) => const Pagina1(),
       },
     );
   }
@@ -47,7 +47,7 @@ class Home extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(80.0),  // Borda arredondada
+                borderRadius: BorderRadius.circular(80.0), // Borda arredondada
                 child: Image.asset(
                   'assets/images/logo2.jpeg',
                   width: 250,

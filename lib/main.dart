@@ -46,6 +46,16 @@ class Home extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(80.0),  // Borda arredondada
+                child: Image.asset(
+                  'assets/images/logo2.jpeg',
+                  width: 250,
+                  height: 250,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/reading-list');

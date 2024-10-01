@@ -5,15 +5,18 @@ import 'database_helper.dart';
 import 'pagina2.dart';
 
 class Pagina1 extends StatefulWidget {
+  const Pagina1({super.key});
+
   @override
   _Pagina1State createState() => _Pagina1State();
 }
 
 class _Pagina1State extends State<Pagina1> {
   List books = [];
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   bool isLoading = true;
   String errorMessage = '';
+
 
   @override
   void initState() {
@@ -21,7 +24,15 @@ class _Pagina1State extends State<Pagina1> {
     fetchBooks();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> fetchBooks([String query = ""]) async {
+    if (!mounted) return;
+
     setState(() {
       isLoading = true;
       errorMessage = '';
@@ -34,22 +45,30 @@ class _Pagina1State extends State<Pagina1> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        setState(() {
-          books = data['items'] ?? [];
-        });
+        if (mounted) {
+          setState(() {
+            books = data['items'] ?? [];
+          });
+        }
       } else {
-        setState(() {
-          errorMessage = 'Erro ao buscar dados: ${response.reasonPhrase}';
-        });
+        if (mounted) {
+          setState(() {
+            errorMessage = 'Erro ao buscar dados: ${response.reasonPhrase}';
+          });
+        }
       }
     } catch (error) {
-      setState(() {
-        errorMessage = 'Erro ao conectar: $error';
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = 'Erro ao conectar: $error';
+        });
+      }
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -62,9 +81,11 @@ class _Pagina1State extends State<Pagina1> {
       'thumbnail': book['volumeInfo']['imageLinks']?['thumbnail']
     };
     await DatabaseHelper().addBook(bookToSave);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Livro adicionado à lista de leitura!')),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Livro adicionado à lista de leitura!')),
+      );
+    }
   }
 
   @override
